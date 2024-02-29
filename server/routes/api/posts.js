@@ -11,9 +11,10 @@ router.get('/', async (req, res) => {
 // Add Blog Post
 router.post('/', async (req, res) => {
   const posts = await loadPostsCollection();
-  const { title, content } = req.body;
+  const { title, subheading, content } = req.body;
   await posts.insertOne({
     title: title,
+    subheading: subheading,
     content: content,
     createdAt: new Date(),
     updatedAt: new Date(),
