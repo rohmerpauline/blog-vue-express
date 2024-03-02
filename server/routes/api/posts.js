@@ -5,15 +5,24 @@ const router = express.Router();
 // Get Blog Post
 router.get('/', async (req, res) => {
   const posts = await loadPostsCollection();
-  res.send(await posts.find({}).toArray());
+
+  const limit = parseInt(req.query.limit, 10);
+  let query = posts.find({}).sort({ createdAt: -1 });
+
+  if (!isNaN(limit) && limit > 0) {
+    query = query.limit(limit);
+  }
+
+  res.send(await query.toArray());
 });
 
 // Add Blog Post
 router.post('/', async (req, res) => {
   const posts = await loadPostsCollection();
-  const { title, subheading, content } = req.body;
+  const { title, subheading, content, author } = req.body;
   await posts.insertOne({
     title: title,
+    author: author,
     subheading: subheading,
     content: content,
     createdAt: new Date(),
@@ -27,6 +36,24 @@ router.delete('/:id', async (req, res) => {
   const posts = await loadPostsCollection();
   await posts.deleteOne({ _id: new mongodb.ObjectId(req.params.id) });
   res.status(201).send();
+});
+
+// Search Blog Posts
+router.get('/', async (req, res) => {
+  const posts = await loadPostsCollection();
+  const searchKeyword = req.query.keyword;
+
+  if (!searchKeyword) {
+    return res.status(400).send({ message: 'Search keyword is required' });
+  }
+
+  const searchRegex = new RegExp(searchKeyword, 'i');
+  const query = {
+    $or: [{ title: { $regex: searchRegex } }, { subheading: { $regex: searchRegex } }],
+  };
+
+  const searchResults = await posts.find(query).toArray();
+  res.send(searchResults);
 });
 
 async function loadPostsCollection() {

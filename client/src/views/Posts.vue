@@ -1,29 +1,18 @@
 <template>
   <div>
     <Heading title="Blog posts" />
-    <div class="posts-container">
-      <div v-for="post in posts" :key="post._id" class="post-card" @click="handleOnClick(post._id)">
-        <h2 class="post-heading">{{ post.title }}</h2>
-        <p class="post-subheading">{{ post.subheading }}</p>
-        <p class="post-content">{{ post.content }}</p>
-      </div>
-    </div>
+    <PostsList :posts="posts" />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useBlogPostStore } from '../stores/BlogPostStore';
-import { useRouter } from 'vue-router';
 import Heading from '../components/atoms/Heading.vue';
+import PostsList from '@/components/organisms/PostsList.vue';
 
 const blogPostStore = useBlogPostStore();
 const posts = ref([]);
-const router = useRouter();
-
-const handleOnClick = (id) => {
-  router.push(`article/${id}`);
-};
 
 const fetchPosts = async () => {
   await blogPostStore.getAllPosts();

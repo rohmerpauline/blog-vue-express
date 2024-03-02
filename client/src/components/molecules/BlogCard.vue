@@ -1,45 +1,56 @@
 <template>
-  <div class="blog-card">
-    <h2 class="blog-title">Exploring the Wonders of Deep Learning</h2>
-    <p class="blog-subheading">Unraveling the Mysteries of Neural Networks and AI Advancements</p>
-    <p class="blog-content">
-      {{ content }}
-    </p>
+  <div class="post-card" @click="handleOnClick(post._id)">
+    <h2 class="post-heading">{{ post.title }}</h2>
+    <p class="post-subheading">{{ post.subheading }}</p>
+    <p class="post-content">{{ post.content }}</p>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-const content = ref(
-  'In this blog post, we delve into the fascinating world of deep learning, discussing its applications, breakthroughs, and the impact it has on various industries. Join us on a journey through neural networks...',
-);
+import { useRouter } from 'vue-router';
 
-/* defineProps({
-  title: String,
-  subheading: String,
-  content: String,
-}); */
+defineProps({
+  post: Object,
+});
+
+const router = useRouter();
+
+const handleOnClick = (id) => {
+  router.push(`article/${id}`);
+};
 </script>
 
 <style scoped>
-.blog-card {
-  padding: 20px;
+.post-card {
   border: 1px solid var(--color-text-gray);
-  border-radius: 15px;
+  border-radius: 8px;
+  padding: 20px;
+  cursor: pointer;
 }
-.blog-title {
-  font-size: 18px;
-  font-weight: 600;
+
+.post-card:hover {
+  box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+  transform: scale(1.01);
+}
+
+.post-card:hover > .post-heading {
+  color: var(--theme-color);
+}
+
+.post-heading {
+  font-size: 20px;
+  font-weight: 700;
   margin-bottom: 3px;
 }
 
-.blog-subheading {
-  font-weight: 300;
-  margin-bottom: 20px;
+.post-subheading {
+  font-weight: 600;
   font-size: 14px;
+  margin-bottom: 15px;
 }
 
-.blog-content {
+.post-content {
   font-size: 13px;
+  font-weight: 300;
 }
 </style>
