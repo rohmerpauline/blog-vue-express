@@ -3,16 +3,45 @@ const router = express.Router();
 const mongodb = require('mongodb');
 const bcrypt = require('bcrypt');
 
+// Get all users
+router.get('/', async (req, res) => {
+  try {
+    const users = await loadUsersCollection();
+    const usernames = await users.find({}, { projection: { password: 0 } }).toArray();
+    res.status(200).json(usernames);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Error retrieving usernames' });
+  }
+});
+
+// Get user by username
+router.get('/:username', async (req, res) => {
+  try {
+    const users = await loadUsersCollection();
+    const user = await users.findOne({ username: req.params.username }, { projection: { password: 0 } });
+
+    if (user === null) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Error retrieving user information' });
+  }
+});
+
 // Add new user
 router.post('/', async (req, res) => {
   try {
     const users = await loadUsersCollection();
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
-    const user = { username: req.body.username, password: hashedPassword };
+    const user = { username: req.body.username, password: hashedPassword, role: req.body.role || 'editor' };
 
     await users.insertOne(user);
-    res.status(201).send();
+    res.status(201).send({ message: 'User has been successfully created' });
   } catch (error) {
     res.status(500).send();
   }
