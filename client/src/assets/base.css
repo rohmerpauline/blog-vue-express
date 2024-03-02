@@ -26,3 +26,7 @@ body {
   padding: 0;
   font-family: 'Poppins', sans-serif;
 }
+
+button {
+  cursor: pointer;
+}
